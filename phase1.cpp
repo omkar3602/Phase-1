@@ -8,10 +8,10 @@ private:
     char M[100][4]; // Physical Memory
     char IR[4];     // Instruction Register (4 bytes)
     char R[4];      // General Purpose Register (4 bytes)
-    int IC;         // Instruction Counter Register (2 bytes)
+    int IC = 0;     // Instruction Counter Register (2 bytes)
     int SI;         // Interrupt
-    bool C;         // Toggle (1 byte)
-    char buffer[40];
+    bool C = false; // Toggle (1 byte)
+    char buffer[80];
 
 public:
     void init();
@@ -48,10 +48,10 @@ void OS::MOS()
 
     if (SI == 1) // Read
     {
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < 80; i++)
             buffer[i] = '\0';
 
-        infile.getline(buffer, 40);
+        infile.getline(buffer, 80);
 
         int k = 0;
         int i = IR[2] - 48;
@@ -67,7 +67,7 @@ void OS::MOS()
                     M[i][j] = buffer[k];
                 k++;
             }
-            if (k == 40)
+            if (k == 80)
             {
                 break;
             }
@@ -75,11 +75,11 @@ void OS::MOS()
         }
 
         cout << endl;
-        printOS();
+        // printOS();
     }
     else if (SI == 2) // Write
     {
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < 80; i++)
             buffer[i] = '\0';
 
         int k = 0;
@@ -97,13 +97,13 @@ void OS::MOS()
 
                 k++;
             }
-            if (k == 40)
+            if (k == 80)
             {
                 break;
             }
             i++;
         }
-        printOS();
+        // printOS();
 
         outfile << "\n";
     }
@@ -166,6 +166,34 @@ void OS::execute()
                 M[i][l] = R[l];
             }
         }
+        else if (IR[0] == 'C' && IR[1] == 'R')
+        {
+            int i = IR[2] - 48;
+            int j = IR[3] - 48;
+            i = i * 10;
+            i += j;
+            int flag = 1;
+            for (int l = 0; l < 4; l++)
+            {
+                if (M[i][l] != R[l])
+                    flag = 0;
+            }
+            if (flag == 0)
+                C = false;
+            else
+                C = true;
+        }
+        else if (IR[0] == 'B' && IR[1] == 'T')
+        {
+            int i = IR[2] - 48;
+            int j = IR[3] - 48;
+            i = i * 10;
+            i += j;
+            if (C == true)
+            {
+                IC = i;
+            }
+        }
     }
 }
 
@@ -179,7 +207,7 @@ void OS::load()
         for (int i = 0; i <= 39; i++)
             buffer[i] = '\0';
 
-        infile.getline(buffer, 40);
+        infile.getline(buffer, 80);
 
         cout << endl
              << "Buffer: ";
@@ -210,17 +238,26 @@ void OS::load()
             {
                 for (int j = 0; j < 4; ++j)
                 {
-
                     M[x][j] = buffer[k];
+
+                    if (buffer[k] == 'H')
+                    {
+                        j++;
+                        M[x][j++] = ' ';
+                        M[x][j++] = ' ';
+                        M[x][j++] = ' ';
+                    }
                     k++;
                 }
 
-                if (k == 40 || buffer[k] == '\0' || buffer[k] == '\n')
+                if (k == 80 || buffer[k] == '\0' || buffer[k] == '\n')
                 {
                     break;
                 }
             }
         }
+
+        printOS();
 
     } while (!infile.eof());
 }
@@ -243,6 +280,9 @@ void OS::printOS()
         cout << R[i];
     }
     cout << endl;
+
+    cout << "IC: " << IC << endl;
+    cout << "C: " << C << endl;
 }
 
 int main()
