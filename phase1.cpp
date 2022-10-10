@@ -19,6 +19,8 @@ public:
     void execute();
     void MOS();
 
+    void printOS();
+
     fstream infile;
     fstream outfile;
 };
@@ -53,7 +55,9 @@ void OS::MOS()
 
         int k = 0;
         int i = IR[2] - 48;
+        int j = IR[3] - 48;
         i = i * 10;
+        i += j;
 
         for (int l = 0; l < 10; ++l)
         {
@@ -71,15 +75,7 @@ void OS::MOS()
         }
 
         cout << endl;
-        for (int i = 0; i < 100; i++)
-        {
-            cout << "M[" << i << "]\t";
-            for (int j = 0; j < 4; j++)
-            {
-                cout << M[i][j];
-            }
-            cout << endl;
-        }
+        printOS();
     }
     else if (SI == 2) // Write
     {
@@ -88,7 +84,9 @@ void OS::MOS()
 
         int k = 0;
         int i = IR[2] - 48;
+        int j = IR[3] - 48;
         i = i * 10;
+        i += j;
 
         for (int l = 0; l < 10; ++l)
         {
@@ -105,15 +103,7 @@ void OS::MOS()
             }
             i++;
         }
-        for (int i = 0; i < 100; i++)
-        {
-            cout << "M[" << i << "]\t";
-            for (int j = 0; j < 4; j++)
-            {
-                cout << M[i][j];
-            }
-            cout << endl;
-        }
+        printOS();
 
         outfile << "\n";
     }
@@ -151,6 +141,31 @@ void OS::execute()
             MOS();
             break;
         }
+        else if (IR[0] == 'L' && IR[1] == 'R')
+        {
+            int i = IR[2] - 48;
+            int j = IR[3] - 48;
+            i = i * 10;
+            i += j;
+
+            for (int l = 0; l < 4; l++)
+            {
+                R[l] = M[i][l];
+            }
+        }
+
+        else if (IR[0] == 'S' && IR[1] == 'R')
+        {
+            int i = IR[2] - 48;
+            int j = IR[3] - 48;
+            i = i * 10;
+            i += j;
+
+            for (int l = 0; l < 4; l++)
+            {
+                M[i][l] = R[l];
+            }
+        }
     }
 }
 
@@ -166,8 +181,12 @@ void OS::load()
 
         infile.getline(buffer, 40);
 
+        cout << endl
+             << "Buffer: ";
+
         for (int k = 0; k <= 39; k++)
             cout << buffer[k];
+        cout << endl;
 
         if (buffer[0] == '$' && buffer[1] == 'A' && buffer[2] == 'M' && buffer[3] == 'J')
         {
@@ -204,6 +223,26 @@ void OS::load()
         }
 
     } while (!infile.eof());
+}
+
+void OS::printOS()
+{
+    for (int i = 0; i < 100; i++)
+    {
+        cout << "M[" << i << "]\t";
+        for (int j = 0; j < 4; j++)
+        {
+            cout << M[i][j];
+        }
+        cout << endl;
+    }
+
+    cout << "R: ";
+    for (int i = 0; i < 4; i++)
+    {
+        cout << R[i];
+    }
+    cout << endl;
 }
 
 int main()
