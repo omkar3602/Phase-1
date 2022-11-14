@@ -11,7 +11,7 @@ private:
     int IC = 0;     // Instruction Counter Register (2 bytes)
     int SI;         // Interrupt
     bool C = false; // Toggle (1 byte)
-    char buffer[80];
+    char buffer[40];
 
 public:
     void init();
@@ -48,10 +48,10 @@ void OS::MOS()
 
     if (SI == 1) // Read
     {
-        for (int i = 0; i < 80; i++)
+        for (int i = 0; i < 40; i++)
             buffer[i] = '\0';
 
-        infile.getline(buffer, 80);
+        infile.getline(buffer, 40);
 
         int k = 0;
         int i = IR[2] - 48;
@@ -67,7 +67,7 @@ void OS::MOS()
                     M[i][j] = buffer[k];
                 k++;
             }
-            if (k == 80)
+            if (k == 40)
             {
                 break;
             }
@@ -79,7 +79,7 @@ void OS::MOS()
     }
     else if (SI == 2) // Write
     {
-        for (int i = 0; i < 80; i++)
+        for (int i = 0; i < 40; i++)
             buffer[i] = '\0';
 
         int k = 0;
@@ -97,7 +97,7 @@ void OS::MOS()
 
                 k++;
             }
-            if (k == 80)
+            if (k == 40)
             {
                 break;
             }
@@ -207,7 +207,7 @@ void OS::load()
         for (int i = 0; i <= 39; i++)
             buffer[i] = '\0';
 
-        infile.getline(buffer, 80);
+        infile.getline(buffer, 40);
 
         cout << endl
              << "Buffer: ";
@@ -250,7 +250,7 @@ void OS::load()
                     k++;
                 }
 
-                if (k == 80 || buffer[k] == '\0' || buffer[k] == '\n')
+                if (k == 40 || buffer[k] == '\0' || buffer[k] == '\n')
                 {
                     break;
                 }
